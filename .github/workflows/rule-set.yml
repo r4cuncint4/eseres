@@ -16,7 +16,6 @@ env:
   SINGBOX_VERSION: "1.11.13"
   DOMAIN_LIST_BASE_URL: "https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists"
   RULE_SET_DIR: "rule-set"
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # Optional, simpan di Secrets jika pakai
 
 jobs:
   build:
@@ -35,15 +34,15 @@ jobs:
       - name: Install sing-box
         if: steps.cache-singbox.outputs.cache-hit != 'true'
         run: |
-          wget --quiet --show-progress --fail https://github.com/SagerNet/sing-box/releases/download/v${SINGBOX_VERSION}/sing-box-${SINGBOX_VERSION}-linux-amd64.tar.gz
+          curl -L -o sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/download/v${SINGBOX_VERSION}/sing-box-${SINGBOX_VERSION}-linux-amd64.tar.gz
           mkdir -p sing-box
-          tar -xvf sing-box-${SINGBOX_VERSION}-linux-amd64.tar.gz --strip-components=1 -C sing-box
+          tar -xvf sing-box.tar.gz --strip-components=1 -C sing-box
           chmod +x sing-box/sing-box
 
       - name: Create rule-set directory
         run: mkdir -p ${{ env.RULE_SET_DIR }}
 
-      - name: Download and convert domain list function
+      - name: Download and convert domain lists
         run: |
           convert() {
             local name=$1
@@ -69,3 +68,4 @@ jobs:
           git add ${{ env.RULE_SET_DIR }}/*.srs
           git diff --cached --quiet || git commit -m "Update rule-set files $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
           git push
+          

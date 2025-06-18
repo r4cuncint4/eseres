@@ -1,0 +1,71 @@
+name: rule-set .srs sing-box
+
+on:
+  schedule:
+    - cron: '0 11 * * *' # 18:00 WIB = 11:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: 'rule-set-update'
+  cancel-in-progress: true
+
+env:
+  SINGBOX_VERSION: "1.11.13"
+  DOMAIN_LIST_BASE_URL: "https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists"
+  RULE_SET_DIR: "rule-set"
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # Optional, simpan di Secrets jika pakai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache sing-box binary
+        id: cache-singbox
+        uses: actions/cache@v3
+        with:
+          path: ./sing-box
+          key: sing-box-${{ env.SINGBOX_VERSION }}-linux-amd64
+
+      - name: Install sing-box
+        if: steps.cache-singbox.outputs.cache-hit != 'true'
+        run: |
+          wget --quiet --show-progress --fail https://github.com/SagerNet/sing-box/releases/download/v${SINGBOX_VERSION}/sing-box-${SINGBOX_VERSION}-linux-amd64.tar.gz
+          mkdir -p sing-box
+          tar -xvf sing-box-${SINGBOX_VERSION}-linux-amd64.tar.gz --strip-components=1 -C sing-box
+          chmod +x sing-box/sing-box
+
+      - name: Create rule-set directory
+        run: mkdir -p ${{ env.RULE_SET_DIR }}
+
+      - name: Download and convert domain list function
+        run: |
+          convert() {
+            local name=$1
+            local url=$2
+            echo "Downloading $name from $url"
+            curl --fail -Ls "$url" -o "$name.txt"
+            ./sing-box/sing-box rule-set convert --type adguard --output ${{ env.RULE_SET_DIR }}/$name.srs "$name.txt"
+          }
+
+          convert hagezi-pro "${DOMAIN_LIST_BASE_URL}/pro-plus/domains.top-n.adblock"
+          convert hagezi-tif "${DOMAIN_LIST_BASE_URL}/tif/domains.top-n.adblock"
+          convert hagezi-gambling "${DOMAIN_LIST_BASE_URL}/gambling/domains.top-n.adblock"
+          convert hagezi-xiaomi "${DOMAIN_LIST_BASE_URL}/native-xiaomi/domains.top-n.adblock"
+          convert hagezi-whitelist "${DOMAIN_LIST_BASE_URL}/whitelist-referral/domains.top-n.adblock"
+
+      - name: Cleanup temporary files
+        run: rm -f *.txt *.tar.gz
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ${{ env.RULE_SET_DIR }}/*.srs
+          git diff --cached --quiet || git commit -m "Update rule-set files $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+          git push

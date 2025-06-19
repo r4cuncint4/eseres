@@ -1,4 +1,4 @@
-name: rule-set .srs sing-box
+name: Update rule-set .srs sing-box
 
 on:
   schedule:
@@ -8,15 +8,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: 'rule-set-update'
-  cancel-in-progress: true
-
-env:
-  SINGBOX_VERSION: "1.11.13"
-  DOMAIN_LIST_BASE_URL: "https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists"
-  RULE_SET_DIR: "rule-set"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,48 +15,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache sing-box binary
-        id: cache-singbox
-        uses: actions/cache@v3
-        with:
-          path: ./sing-box
-          key: sing-box-${{ env.SINGBOX_VERSION }}-linux-amd64
-
-      - name: Install sing-box
-        if: steps.cache-singbox.outputs.cache-hit != 'true'
+      - name: Install sing-box, download & convert domain lists, commit changes
         run: |
+          SINGBOX_VERSION="1.11.13"
+          RULE_SET_DIR="rule-set"
+          mkdir -p $RULE_SET_DIR
+
+          # Install sing-box
           curl -L -o sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/download/v${SINGBOX_VERSION}/sing-box-${SINGBOX_VERSION}-linux-amd64.tar.gz
           mkdir -p sing-box
           tar -xvf sing-box.tar.gz --strip-components=1 -C sing-box
           chmod +x sing-box/sing-box
 
-      - name: Create rule-set directory
-        run: mkdir -p ${{ env.RULE_SET_DIR }}
-
-      - name: Download and convert domain lists
-        run: |
+          # Function to download and convert
           convert() {
-            local name=$1
-            local url=$2
-            echo "Downloading $name from $url"
-            curl --fail -Ls "$url" -o "$name.txt"
-            ./sing-box/sing-box rule-set convert --type adguard --output ${{ env.RULE_SET_DIR }}/$name.srs "$name.txt"
+            echo "Downloading $1 from $2"
+            curl --fail -Ls "$2" -o "$1.txt"
+            ./sing-box/sing-box rule-set convert --type adguard --output $RULE_SET_DIR/$1.srs "$1.txt"
           }
 
-          convert hagezi-pro "${DOMAIN_LIST_BASE_URL}/pro-plus/domains.top-n.adblock"
-          convert hagezi-tif "${DOMAIN_LIST_BASE_URL}/tif/domains.top-n.adblock"
-          convert hagezi-gambling "${DOMAIN_LIST_BASE_URL}/gambling/domains.top-n.adblock"
-          convert hagezi-xiaomi "${DOMAIN_LIST_BASE_URL}/native-xiaomi/domains.top-n.adblock"
-          convert hagezi-whitelist "${DOMAIN_LIST_BASE_URL}/whitelist-referral/domains.top-n.adblock"
+          # List domain sources
+          convert hagezi-pro https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/pro-plus/domains.top-n.adblock
+          convert hagezi-tif https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/tif/domains.top-n.adblock
+          convert hagezi-gambling https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/gambling/domains.top-n.adblock
+          convert hagezi-xiaomi https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/native-xiaomi/domains.top-n.adblock
+          convert hagezi-whitelist https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/whitelist-referral/domains.top-n.adblock
+          convert stevenblack https://raw.githubusercontent.com/cbuijs/stevenblack/refs/heads/main/domains/adware-malware-fakenews-gambling.list
+          convert oisd-big https://raw.githubusercontent.com/cbuijs/oisd/refs/heads/master/big/domains.top-n
+          convert ut1-dating https://raw.githubusercontent.com/cbuijs/ut1/refs/heads/master/dating/domains.top-n
+          convert ut1-gambling https://raw.githubusercontent.com/cbuijs/ut1/refs/heads/master/gambling/domains.top-n
 
-      - name: Cleanup temporary files
-        run: rm -f *.txt *.tar.gz
+          # Cleanup
+          rm -f *.txt *.tar.gz
 
-      - name: Commit and push changes
-        run: |
+          # Commit and push changes if any
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ${{ env.RULE_SET_DIR }}/*.srs
-          git diff --cached --quiet || git commit -m "Update rule-set files $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
-          git push
-          
+          git add $RULE_SET_DIR/*.srs
+          if ! git diff --cached --quiet; then
+            git commit -m "Update rule-set files $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git push
+          else
+            echo "No changes detected."
+          fi

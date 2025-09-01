@@ -17,7 +17,7 @@ jobs:
 
       - name: Install sing-box, download & convert domain lists, commit changes
         run: |
-          SINGBOX_VERSION="1.11.13"
+          SINGBOX_VERSION="1.12.4"
           RULE_SET_DIR="rule-set"
           mkdir -p $RULE_SET_DIR
 
@@ -35,14 +35,15 @@ jobs:
           }
 
           # List domain sources
-          convert Core https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/pro/domains
-          convert TIF https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/tif/domains
-          convert Bypass https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/whitelist-referral/domains
-          convert Hoster https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/hoster/domains
-          convert Gambling https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/gambling/domains
-          convert Microsoft https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/native-winoffice/domains
-          convert Xiaomi https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/native-xiaomi/domains
-          convert Judol https://raw.githubusercontent.com/BrigsLabs/judol/refs/heads/main/judol_domains.txt
+          convert Core https://raw.githubusercontent.com/cbuijs/hagezi/main/lists/pro/domains
+          convert TIF https://raw.githubusercontent.com/cbuijs/hagezi/main/lists/tif/domains
+          convert Ads https://raw.githubusercontent.com/cbuijs/hagezi/main/lists/popupads/domains
+          convert Hoster https://raw.githubusercontent.com/cbuijs/hagezi/main/lists/hoster/domains
+          convert Gambling https://raw.githubusercontent.com/cbuijs/hagezi/main/lists/gambling/domains
+          convert Microsoft https://raw.githubusercontent.com/cbuijs/hagezi/main/lists/native-winoffice/domains
+          convert Xiaomi https://raw.githubusercontent.com/cbuijs/hagezi/main/lists/native-xiaomi/domains
+          convert BadBlock https://raw.githubusercontent.com/celenityy/BadBlock/pages/wildcards-no-star/badblock.txt
+          convert Judol https://raw.githubusercontent.com/BrigsLabs/judol/main/judol_domains.txt
 
           # Cleanup
           rm -f *.txt *.tar.gz

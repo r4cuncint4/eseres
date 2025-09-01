@@ -35,15 +35,14 @@ jobs:
           }
 
           # List domain sources
-          convert hagezi-pro https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/pro-plus/domains.top-n.adblock
-          convert hagezi-tif https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/tif/domains.top-n.adblock
-          convert hagezi-gambling https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/gambling/domains.top-n.adblock
-          convert hagezi-xiaomi https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/native-xiaomi/domains.top-n.adblock
-          convert hagezi-whitelist https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/whitelist-referral/domains.top-n.adblock
-          convert stevenblack https://raw.githubusercontent.com/cbuijs/stevenblack/refs/heads/main/domains/adware-malware-fakenews-gambling.list
-          convert oisd-big https://raw.githubusercontent.com/cbuijs/oisd/refs/heads/master/big/domains.top-n
-          convert ut1-dating https://raw.githubusercontent.com/cbuijs/ut1/refs/heads/master/dating/domains.top-n
-          convert ut1-gambling https://raw.githubusercontent.com/cbuijs/ut1/refs/heads/master/gambling/domains.top-n
+          convert Core https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/pro/domains
+          convert TIF https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/tif/domains
+          convert Bypass https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/whitelist-referral/domains
+          convert Hoster https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/hoster/domains
+          convert Gambling https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/gambling/domains
+          convert Microsoft https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/native-winoffice/domains
+          convert Xiaomi https://raw.githubusercontent.com/cbuijs/hagezi/refs/heads/main/lists/native-xiaomi/domains
+          convert Judol https://raw.githubusercontent.com/BrigsLabs/judol/refs/heads/main/judol_domains.txt
 
           # Cleanup
           rm -f *.txt *.tar.gz

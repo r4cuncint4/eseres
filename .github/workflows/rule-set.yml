@@ -39,6 +39,7 @@ jobs:
           convert TIF https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/tif.txt
           convert Hoster https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/hoster-onlydomains.txt
           convert Gambling https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/gambling-onlydomains.txt
+          convert Ads https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/wildcard/popupads-onlydomains.txt
           convert Microsoft https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.winoffice.txt
           convert Xiaomi https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.xiaomi.txt
           convert Judol https://raw.githubusercontent.com/BrigsLabs/judol/main/judol_domains.txt

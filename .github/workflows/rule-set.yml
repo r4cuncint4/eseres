@@ -17,7 +17,7 @@ jobs:
 
       - name: Install sing-box, download & convert domain lists, commit changes
         run: |
-          SINGBOX_VERSION="1.12.4"
+          SINGBOX_VERSION="1.12.14"
           RULE_SET_DIR="rule-set"
           mkdir -p $RULE_SET_DIR
 
@@ -35,14 +35,11 @@ jobs:
           }
 
           # List domain sources
-          convert Core https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/pro.txt
-          convert TIF https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/tif.txt
-          convert Hoster https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/hoster-onlydomains.txt
-          convert Gambling https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/gambling-onlydomains.txt
-          convert Ads https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/wildcard/popupads-onlydomains.txt
-          convert Microsoft https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.winoffice.txt
-          convert Xiaomi https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.xiaomi.txt
-          convert Judol https://raw.githubusercontent.com/BrigsLabs/judol/main/judol_domains.txt
+          convert Core https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/pro.txt
+          convert TIF https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/tif.txt
+          convert Gambling https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/gambling.txt
+          convert BadBlock https://badblock.celenity.dev/wildcards-star/badblock.txt
+          convert Whitelist https://badblock.celenity.dev/wildcards-star/whitelist.txt
 
           # Cleanup
           rm -f *.txt *.tar.gz
